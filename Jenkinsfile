@@ -32,7 +32,7 @@ pipeline {
             docker tag ${IMAGE}:${env.VERSION} \$DOCKER_USER/${IMAGE}:${env.VERSION}
             docker push \$DOCKER_USER/${IMAGE}:${env.VERSION}
           """
-          // ✅ Save DOCKER_USER to env so Deploy stage can access it
+          // ✅ Save to env so Deploy stage can access it
           script {
             env.DOCKER_USER = DOCKER_USER
           }
