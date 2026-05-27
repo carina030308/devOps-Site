@@ -1,23 +1,18 @@
 pipeline {
   agent any
-
   triggers {
     githubPush()
   }
-
   environment {
     IMAGE = "devops-site"
   }
-
   stages {
-
     stage('Checkout') {
       steps {
         git branch: 'main',
             url: 'https://github.com/carina030308/devOps-Site.git'
       }
     }
-
     stage('Build') {
       steps {
         script {
@@ -27,7 +22,6 @@ pipeline {
         sh "docker build -t ${IMAGE}:${env.VERSION} ."
       }
     }
-
     stage('Login & Push') {
       steps {
         withCredentials([usernamePassword(
@@ -40,10 +34,13 @@ pipeline {
             docker tag ${IMAGE}:${env.VERSION} \$DOCKER_USER/${IMAGE}:${env.VERSION}
             docker push \$DOCKER_USER/${IMAGE}:${env.VERSION}
           """
+          // ✅ Save DOCKER_USER to env so Deploy stage can access it
+          script {
+            env.DOCKER_USER = DOCKER_USER
+          }
         }
       }
     }
-
     stage('Deploy') {
       steps {
         sh """
@@ -53,13 +50,11 @@ pipeline {
             --name ${IMAGE} \
             --restart unless-stopped \
             -p 5000:5000 \
-            \$DOCKER_USER/${IMAGE}:${env.VERSION}
+            ${env.DOCKER_USER}/${IMAGE}:${env.VERSION}
         """
       }
     }
-
   }
-
   post {
     success {
       echo "Build ${env.VERSION} deployed successfully."
