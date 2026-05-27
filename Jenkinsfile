@@ -1,8 +1,6 @@
 pipeline {
   agent any
-  triggers {
-    githubPush()
-  }
+
   environment {
     IMAGE = "devops-site"
   }
